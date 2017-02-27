@@ -10,6 +10,7 @@ function formatRut(_value, _default) {
 
   var result = _value.slice(-4,-1) + '-' + _value.substr(_value.length-1);
   for(var i = 4; i < _value.length; i+=3) result = _value.slice(-3-i,-i) + '.' + result;
+
   return result;
 }
 
@@ -50,8 +51,13 @@ function formatRutOnWatch($scope, ngModel) {
   $scope.$watch(function() {
     return ngModel.$viewValue;
   }, function() {
-    ngModel.$setViewValue(formatRut(ngModel.$viewValue));
-    ngModel.$render();
+    /* need to apply changes in the next event loop iteration since
+       Chrome 56 on android has a nasty bug with cursor (selection)
+    */
+    setTimeout(function(){
+      ngModel.$setViewValue(formatRut(ngModel.$viewValue));
+      ngModel.$render();
+    }, 1);
   });
 }
 
